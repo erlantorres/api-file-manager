@@ -22,8 +22,32 @@ public class FileController(IFileDatabaseService fileDatabaseService) : Controll
                 return BadRequest($"The request couldn't be processed (Form without multipart content.).");
             }
 
-            await fileDatabaseService.UploadLargeFiles(Request.Body, Request.ContentType);
+            await fileDatabaseService.UploadLargeFilesAsync(Request.Body, Request.ContentType);
             return Ok("Files uploaded");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAsync(string operation, string fileName)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(operation))
+            {
+                return BadRequest($"{nameof(operation)} is required");
+            }
+
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return BadRequest($"{nameof(fileName)} is required");
+            }
+
+            await fileDatabaseService.DeleteAsync(operation, fileName);
+            return StatusCode(204, "File deleted");
         }
         catch (Exception ex)
         {

@@ -2,6 +2,7 @@
 using api.Domain.DatabaseServices.Services.Interfaces;
 using api.Domain.FileServices.Data.Entities;
 using api.Domain.FileServices.Data.Repositories.Interfaces;
+using api.Domain.FileServices.Dtos;
 
 namespace api.Domain.FileServices.Data.Repositories;
 
@@ -34,23 +35,23 @@ public class FileRepository(IDbContext context) : IFileRepository
         )
     ";
 
+    public async Task DeleteAsync(FileDeleteDto parameters)
+    {
+        var delete = @$"delete FileUpload where Name = @{nameof(parameters.FileName)} and Operation = @{nameof(parameters.Operation)}";
+        await context.ExecuteAsync(delete, parameters);
+    }
 
-    public Task Delete(string name)
+    public Task<FileEntity> GetAsync(string fileName)
     {
         throw new NotImplementedException();
     }
 
-    public Task<FileEntity> Get(string name)
+    public Task<IEnumerable<FileEntity>> GetAllAsync(string operation)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<FileEntity>> GetAll(string operation)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task Save(FileEntity fileEntity)
+    public async Task SaveAsync(FileEntity fileEntity)
     {
         await context.ExecuteAsync(_sqlInsert, fileEntity);
     }
