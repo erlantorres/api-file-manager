@@ -84,4 +84,29 @@ public class FileController(IFileDatabaseService fileDatabaseService) : Controll
             return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpGet]
+    [Route("get-all")]
+    public async Task<ActionResult<List<FileDto>>> GetAllAsync(string operation)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(operation))
+            {
+                return BadRequest($"{nameof(operation)} is required");
+            }
+
+            var files = await fileDatabaseService.GetAllFileAsync(operation);
+            if (files == null || files.Count <= 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(files);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

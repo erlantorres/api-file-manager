@@ -39,7 +39,7 @@ public class FileDatabaseService(
         try
         {
             var file = await fileRepository.GetAsync(operation, fileName);
-            return file != null ? file.ParseToDto() : new();
+            return file.ParseToDto();
         }
         catch (Exception ex)
         {
@@ -49,9 +49,19 @@ public class FileDatabaseService(
         }
     }
 
-    public Task<FileDto> GetAllFileAsync(string operation)
+    public async Task<List<FileDto>> GetAllFileAsync(string operation)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var files = await fileRepository.GetAllAsync(operation);
+            return files.ParseToDto();
+        }
+        catch (Exception ex)
+        {
+            var errorId = GetErrorId;
+            logger.LogError(ex, $"GetAllFileAsync error id {errorId}: {ex.Message}");
+            throw new Exception($"Error getting files! Please provide the ID {errorId} to support for assistance.");
+        }
     }
 
     public async Task UploadLargeFilesAsync(Stream stream, string contentType)

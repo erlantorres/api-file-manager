@@ -46,9 +46,10 @@ public class FileRepository(IDbContext context) : IFileRepository
         return await context.QueryFirstOrDefaultAsync<FileEntity>(sql, new { fileName, operation });
     }
 
-    public Task<IEnumerable<FileEntity>> GetAllAsync(string operation)
+    public async Task<IEnumerable<FileEntity>> GetAllAsync(string operation)
     {
-        throw new NotImplementedException();
+        var sql = @$"{_sqlQuery} where  Operation = @{nameof(operation)}";
+        return await context.QueryAsync<FileEntity>(sql, new { operation });
     }
 
     public async Task SaveAsync(FileEntity fileEntity)

@@ -8,7 +8,7 @@ public interface IFileService
     Task<FileDto> GetFileAsync(string fileName, string operation);
     Task UploadLargeFilesAsync(Stream stream, string contentType);
     Task DeleteAsync(string operation, string fileName);
-    Task<FileDto> GetAllFileAsync(string operation);
+    Task<List<FileDto>> GetAllFileAsync(string operation);
 }
 
 

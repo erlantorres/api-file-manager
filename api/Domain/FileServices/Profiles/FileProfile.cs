@@ -6,7 +6,7 @@ namespace api.Domain.FileServices.Profiles;
 
 public static class FileProfile
 {
-    public static FileDto ParseToDto(this FileEntity entity)
+    public static FileDto ParseToDto(this FileEntity? entity)
     {
         if (entity == null)
         {
@@ -23,5 +23,16 @@ public static class FileProfile
             Size = entity.Size,
             Content = entity.Content
         };
+    }
+
+    public static List<FileDto> ParseToDto(this IEnumerable<FileEntity> entities)
+    {
+        var dtos = new List<FileDto>();
+        foreach (var entity in entities)
+        {
+            dtos.Add(entity.ParseToDto());
+        }
+
+        return dtos;
     }
 }
