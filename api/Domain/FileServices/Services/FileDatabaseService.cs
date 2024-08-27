@@ -45,8 +45,6 @@ public class FileDatabaseService(IFileRepository fileRepository) : IFileDatabase
             var hasContentDispositionHeader = ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var contentDisposition);
             if (hasContentDispositionHeader && MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
             {
-                var operation = contentDisposition.Parameters.First(p => p.Name == "operation").Value.ToString();
-
                 using (var memoryStream = new MemoryStream())
                 {
                     await section.Body.CopyToAsync(memoryStream);
@@ -55,10 +53,10 @@ public class FileDatabaseService(IFileRepository fileRepository) : IFileDatabase
                     await fileRepository.Save(new FileEntity
                     {
                         CreateDate = DateTimeHelper.DataHoraDeBrasilia,
-                        Operation = operation,
+                        Operation = contentDisposition.Name.Value,
                         Status = Enum.GetName(typeof(FileStatus), FileStatus.UPLOAD),
-                        Name = contentDisposition.FileName.Value,
-                        TrustedName = WebUtility.HtmlEncode(contentDisposition.FileName.Value),
+                        Name = WebUtility.HtmlEncode(contentDisposition.FileName.Value),
+                        UnTrustedName = contentDisposition.FileName.Value,
                         Size = fileBytes.Length,
                         Content = fileBytes
                     });

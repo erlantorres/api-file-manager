@@ -14,7 +14,7 @@ public class FileRepository(IDbContext context) : IFileRepository
             {nameof(FileEntity.Operation)},
             {nameof(FileEntity.CreateDate)},
             {nameof(FileEntity.Status)},
-            {nameof(FileEntity.TrustedName)},
+            {nameof(FileEntity.UnTrustedName)},
             {nameof(FileEntity.Size)},
             {nameof(FileEntity.Content)}
         from
@@ -22,13 +22,13 @@ public class FileRepository(IDbContext context) : IFileRepository
     ";
 
     private const string _sqlInsert = $@"
-        insert into FileUpload (Name, Operation, CreateDate, Status, TrustedName, Size, Content)
+        insert into FileUpload (Name, Operation, CreateDate, Status, UnTrustedName, Size, Content)
         values(
             @{nameof(FileEntity.Name)}, 
             @{nameof(FileEntity.Operation)}, 
             @{nameof(FileEntity.CreateDate)}, 
             @{nameof(FileEntity.Status)}, 
-            @{nameof(FileEntity.TrustedName)}, 
+            @{nameof(FileEntity.UnTrustedName)}, 
             @{nameof(FileEntity.Size)}, 
             @{nameof(FileEntity.Content)}
         )

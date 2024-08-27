@@ -1,20 +1,13 @@
 @api_HostAddress = https://localhost:7036/api/File
 
 POST {{api_HostAddress}}/upload-large-files
-Accept: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-Content-Type: multipart/form-data; boundary=---011000010111000001101001
+Content-Type: multipart/form-data; boundary=011000010111000001101001
 
------011000010111000001101001
-Content-Disposition: form-data; operation=my_operation; name="name"; filename="name.xlsx"
-Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-<@ some_path_directory
-
------011000010111000001101001
+--011000010111000001101001
 Content-Disposition: form-data; operation=my_operation; name="name2"; filename="name2.xlsx"
-Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-<@ some_path_directory
+<@ C:\var\temp\imagem.png
 
------011000010111000001101001--
+--011000010111000001101001--
 
 
 ###

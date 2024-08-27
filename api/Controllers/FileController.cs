@@ -21,7 +21,7 @@ public class FileController(IFileDatabaseService fileDatabaseService) : Controll
             {
                 return BadRequest($"The request couldn't be processed (Form without multipart content.).");
             }
-            
+
             await fileDatabaseService.UploadLargeFiles(Request.Body, Request.ContentType);
             return Ok("Files uploaded");
         }
