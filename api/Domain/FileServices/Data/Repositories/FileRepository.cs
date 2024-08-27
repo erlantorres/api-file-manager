@@ -7,8 +7,19 @@ namespace api.Domain.FileServices.Data.Repositories;
 
 public class FileRepository(IDbContext context) : IFileRepository
 {
+    private const string _sqlQueryWithoutContent = $@"
+        select
+            {nameof(FileEntity.Name)},
+            {nameof(FileEntity.Operation)},
+            {nameof(FileEntity.CreateDate)},
+            {nameof(FileEntity.Status)},
+            {nameof(FileEntity.UnTrustedName)},
+            {nameof(FileEntity.Size)}
+        from
+            FileUpload with(nolock)
+    ";
 
-    private const string _sqlQuery = $@"
+    private const string _sqlQueryWithContent = $@"
         select
             {nameof(FileEntity.Name)},
             {nameof(FileEntity.Operation)},
@@ -40,15 +51,21 @@ public class FileRepository(IDbContext context) : IFileRepository
         await context.ExecuteAsync(delete, new { fileName, operation });
     }
 
+    public async Task<FileEntity?> GetWithContentAsync(string operation, string fileName)
+    {
+        var sql = @$"{_sqlQueryWithContent} where Name = @{nameof(fileName)} and Operation = @{nameof(operation)}";
+        return await context.QueryFirstOrDefaultAsync<FileEntity>(sql, new { fileName, operation });
+    }
+
     public async Task<FileEntity?> GetAsync(string operation, string fileName)
     {
-        var sql = @$"{_sqlQuery} where Name = @{nameof(fileName)} and Operation = @{nameof(operation)}";
+        var sql = @$"{_sqlQueryWithoutContent} where Name = @{nameof(fileName)} and Operation = @{nameof(operation)}";
         return await context.QueryFirstOrDefaultAsync<FileEntity>(sql, new { fileName, operation });
     }
 
     public async Task<IEnumerable<FileEntity>> GetAllAsync(string operation)
     {
-        var sql = @$"{_sqlQuery} where  Operation = @{nameof(operation)}";
+        var sql = @$"{_sqlQueryWithoutContent} where  Operation = @{nameof(operation)}";
         return await context.QueryAsync<FileEntity>(sql, new { operation });
     }
 

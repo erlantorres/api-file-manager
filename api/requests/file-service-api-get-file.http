@@ -1,7 +1,12 @@
 @api_HostAddress = https://localhost:7036/api/File
 
-GET {{api_HostAddress}}?operation=B3&fileName=Consulta_Rentabilidade_08823481910.xlsx
+# GET
+GET {{api_HostAddress}}?operation=operation&fileName=file.xlsx
 
 ###
+# GETALL
+GET {{api_HostAddress}}/get-all?operation=operation
 
-GET {{api_HostAddress}}/get-all?operation=B3
+###
+# DOWNLOAD
+GET {{api_HostAddress}}/download?operation=operation&fileName=file.xlsx

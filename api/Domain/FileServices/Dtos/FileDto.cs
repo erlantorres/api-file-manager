@@ -9,5 +9,4 @@ public class FileDto
     public string Status { get; set; }
     public string UnTrustedName { get; set; }
     public long Size { get; set; }
-    public byte[] Content { get; set; }
 }

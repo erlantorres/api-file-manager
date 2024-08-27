@@ -6,14 +6,14 @@ namespace api.Domain.FileServices.Profiles;
 
 public static class FileProfile
 {
-    public static FileDto ParseToDto(this FileEntity? entity)
+    public static FileContentDto ParseWithContentToDto(this FileEntity? entity)
     {
         if (entity == null)
         {
             return new();
         }
 
-        return new FileDto
+        return new()
         {
             Name = entity.Name,
             Operation = entity.Operation,
@@ -22,6 +22,24 @@ public static class FileProfile
             UnTrustedName = entity.UnTrustedName,
             Size = entity.Size,
             Content = entity.Content
+        };
+    }
+
+    public static FileDto ParseToDto(this FileEntity? entity)
+    {
+        if (entity == null)
+        {
+            return new();
+        }
+
+        return new()
+        {
+            Name = entity.Name,
+            Operation = entity.Operation,
+            CreateDate = entity.CreateDate,
+            Status = entity.Status,
+            UnTrustedName = entity.UnTrustedName,
+            Size = entity.Size
         };
     }
 
