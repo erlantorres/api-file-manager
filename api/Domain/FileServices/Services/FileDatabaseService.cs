@@ -9,6 +9,7 @@ using api.Domain.FileServices.Dtos;
 using api.Domain.FileServices.Helpers;
 using api.Domain.FileServices.Services.Interfaces;
 using api.Domain.Shared.Helpers;
+using api.Domain.FileServices.Profiles;
 
 namespace api.Domain.FileServices.Services;
 
@@ -23,17 +24,32 @@ public class FileDatabaseService(
     {
         try
         {
-            await fileRepository.DeleteAsync(new FileDeleteDto { Operation = operation, FileName = fileName });
+            await fileRepository.DeleteAsync(operation, fileName);
         }
         catch (Exception ex)
         {
             var errorId = GetErrorId;
-            logger.LogError(ex, $"Delete error id {errorId}: {ex.Message}");
+            logger.LogError(ex, $"DeleteAsync error id {errorId}: {ex.Message}");
             throw new Exception($"Error deleting a file! Please provide the ID {errorId} to support for assistance.");
         }
     }
 
-    public Task<FileDto> DownloadAsync(string operation, string fileName)
+    public async Task<FileDto> GetFileAsync(string operation, string fileName)
+    {
+        try
+        {
+            var file = await fileRepository.GetAsync(operation, fileName);
+            return file != null ? file.ParseToDto() : new();
+        }
+        catch (Exception ex)
+        {
+            var errorId = GetErrorId;
+            logger.LogError(ex, $"GetFileAsync error id {errorId}: {ex.Message}");
+            throw new Exception($"Error getting file! Please provide the ID {errorId} to support for assistance.");
+        }
+    }
+
+    public Task<FileDto> GetAllFileAsync(string operation)
     {
         throw new NotImplementedException();
     }
@@ -73,7 +89,7 @@ public class FileDatabaseService(
         catch (Exception ex)
         {
             var errorId = GetErrorId;
-            logger.LogError(ex, $"UploadLargeFiles error id {errorId}: {ex.Message}");
+            logger.LogError(ex, $"UploadLargeFilesAsync error id {errorId}: {ex.Message}");
             throw new Exception($"Error uploading large file! Please provide the ID {errorId} to support for assistance.");
         }
     }

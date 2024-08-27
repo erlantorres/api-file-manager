@@ -1,0 +1,3 @@
+@api_HostAddress = https://localhost:7036/api/File
+
+GET {{api_HostAddress}}?operation=B3&fileName=Consulta_Rentabilidade_08823481910.xlsx

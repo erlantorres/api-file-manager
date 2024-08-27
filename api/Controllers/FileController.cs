@@ -1,4 +1,5 @@
 using api.Domain.Attributes;
+using api.Domain.FileServices.Dtos;
 using api.Domain.FileServices.Helpers;
 using api.Domain.FileServices.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +49,35 @@ public class FileController(IFileDatabaseService fileDatabaseService) : Controll
 
             await fileDatabaseService.DeleteAsync(operation, fileName);
             return StatusCode(204, "File deleted");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<FileDto>> GetAsync(string operation, string fileName)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(operation))
+            {
+                return BadRequest($"{nameof(operation)} is required");
+            }
+
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return BadRequest($"{nameof(fileName)} is required");
+            }
+
+            var file = await fileDatabaseService.GetFileAsync(operation, fileName);
+            if (file == null || string.IsNullOrWhiteSpace(file.Name))
+            {
+                return NotFound();
+            }
+
+            return Ok(file);
         }
         catch (Exception ex)
         {

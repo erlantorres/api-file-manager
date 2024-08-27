@@ -1,13 +1,12 @@
 
 using api.Domain.FileServices.Data.Entities;
-using api.Domain.FileServices.Dtos;
 
 namespace api.Domain.FileServices.Data.Repositories.Interfaces;
 
 public interface IFileRepository
 {
     Task SaveAsync(FileEntity fileEntity);
-    Task<FileEntity> GetAsync(string fileName);
+    Task<FileEntity?> GetAsync(string operation, string fileName);
     Task<IEnumerable<FileEntity>> GetAllAsync(string operation);
-    Task DeleteAsync(FileDeleteDto parameters);
+    Task DeleteAsync(string operation, string fileName);
 }

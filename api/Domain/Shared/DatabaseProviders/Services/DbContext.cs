@@ -46,4 +46,10 @@ public class DbContext : IDbContext
         using var conn = GetOpenConnection();
         return await conn.QueryFirstAsync<T>(sql, param, transaction, commandTimeout ?? _timeout, CommandType.Text);
     }
+
+    public virtual async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null)
+    {
+        using var conn = GetOpenConnection();
+        return await conn.QueryFirstOrDefaultAsync<T>(sql, param, transaction, commandTimeout ?? _timeout, CommandType.Text);
+    }
 }
