@@ -20,21 +20,6 @@ public class FileDatabaseService(
 
     private static string GetErrorId { get { return Guid.NewGuid().ToString(); } }
 
-    public async Task<FileContentDto> DownloadAsync(string operation, string fileName)
-    {
-        try
-        {
-            var file = await fileRepository.GetWithContentAsync(operation, fileName);
-            return file.ParseWithContentToDto();
-        }
-        catch (Exception ex)
-        {
-            var errorId = GetErrorId;
-            logger.LogError(ex, $"DownloadAsync error id {errorId}: {ex.Message}");
-            throw new Exception($"Error downloading file! Please provide the ID {errorId} to support for assistance.");
-        }
-    }
-
     public async Task DeleteAsync(string operation, string fileName)
     {
         try
@@ -49,12 +34,12 @@ public class FileDatabaseService(
         }
     }
 
-    public async Task<FileDto> GetFileAsync(string operation, string fileName)
+    public async Task<FileContentDto> GetFileAsync(string operation, string fileName)
     {
         try
         {
-            var file = await fileRepository.GetAsync(operation, fileName);
-            return file.ParseToDto();
+             var file = await fileRepository.GetWithContentAsync(operation, fileName);
+            return file.ParseWithContentToDto();
         }
         catch (Exception ex)
         {
