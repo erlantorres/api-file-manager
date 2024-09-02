@@ -5,5 +5,5 @@ namespace api.Domain.FileServices.Services.Interfaces;
 
 public interface IQueueService
 {
-    Task SendAsync(FileContentDto fileContent);
+    Task SendAsync(FileMessageQueueDto fileMessageQueue);
 }

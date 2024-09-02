@@ -1,4 +1,5 @@
 
+using api.Domain.FileServices.Data.Enums;
 using api.Domain.FileServices.Dtos;
 
 namespace api.Domain.FileServices.Services.Interfaces;

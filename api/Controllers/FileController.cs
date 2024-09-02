@@ -57,7 +57,7 @@ public class FileController(IFileDatabaseService fileDatabaseService) : Controll
     }
 
     [HttpGet]
-    public async Task<ActionResult<FileDto>> GetAsync(string operation, string fileName)
+    public async Task<ActionResult<FileContentDto>> GetAsync(string operation, string fileName)
     {
         try
         {

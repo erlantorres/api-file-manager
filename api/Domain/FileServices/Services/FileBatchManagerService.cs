@@ -1,12 +1,14 @@
 
+using api.Domain.FileServices.Data.Enums;
 using api.Domain.FileServices.Dtos;
 using api.Domain.FileServices.Services.Interfaces;
 
 namespace api.Domain.FileServices.Services;
 
 public class FileBatchManagerService(
-    IFileService fileService,
-    IFileBatchService fileBatchManagerService
+    IFileDatabaseService fileDatabaseService,
+    IFileBatchService fileBatchManagerService,
+    IQueueService queueService
 ) : IFileBatchManagerService
 {
     public async Task<int> ProcessFilesAsync(List<FileProcessDto> files)
@@ -16,18 +18,26 @@ public class FileBatchManagerService(
 
         files.ForEach(async file =>
         {
-            // get files from base
-            var fileContent = await fileService.GetFileAsync(file.Operation, file.Name);
-            if (fileContent == null || fileContent.Content.Length == 0)
+            // get files with content from base
+            var fileContent = await fileDatabaseService.GetFileAsync(file.Operation, file.Name);
+            if (fileContent != null && fileContent.Content != null && fileContent.Content.Length > 0)
             {
-                continue;
-            }
+                // add file in the batch
+                var fileBatchId = await fileBatchManagerService.AddFilesToBatchAsync(batchId, fileContent);
 
-            await fileBatchManagerService.AddFilesToBatchAsync(batchId, fileContent);
+                // update file to processing
+                await fileDatabaseService.UpdateFileStatusAsync(fileContent.Name, FileStatus.PROCESSING);
+
+                // send file to queue
+                await queueService.SendAsync(new FileMessageQueueDto
+                {
+                    BatchId = batchId,
+                    FileBatchId = fileBatchId,
+                    FileContent = fileContent
+                });
+            }
         });
 
-
-
-        throw new NotImplementedException();
+        return batchId;
     }
 }
