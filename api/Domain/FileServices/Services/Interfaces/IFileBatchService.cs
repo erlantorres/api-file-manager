@@ -5,6 +5,6 @@ namespace api.Domain.FileServices.Services.Interfaces;
 
 public interface IFileBatchService
 {
-    Task<int> AddFilesToBatchAsync(int batchId, FileContentDto fileContent);
-    Task<int> CreateBatchAsync();
+    Task<int> AddFileToBatchAsync(int batchId, FileDto fileContent);
+    Task<int> CreateBatchAsync(int qtdyFiles);
 }

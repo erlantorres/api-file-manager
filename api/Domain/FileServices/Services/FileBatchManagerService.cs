@@ -7,14 +7,14 @@ namespace api.Domain.FileServices.Services;
 
 public class FileBatchManagerService(
     IFileDatabaseService fileDatabaseService,
-    IFileBatchService fileBatchManagerService,
+    IFileBatchService fileBatchService,
     IQueueService queueService
 ) : IFileBatchManagerService
 {
     public async Task<int> ProcessFilesAsync(List<FileProcessDto> files)
     {
         // create lote 
-        var batchId = await fileBatchManagerService.CreateBatchAsync();
+        var batchId = await fileBatchService.CreateBatchAsync(files.Count);
 
         files.ForEach(async file =>
         {
@@ -23,10 +23,10 @@ public class FileBatchManagerService(
             if (fileContent != null && fileContent.Content != null && fileContent.Content.Length > 0)
             {
                 // add file in the batch
-                var fileBatchId = await fileBatchManagerService.AddFilesToBatchAsync(batchId, fileContent);
+                var fileBatchId = await fileBatchService.AddFileToBatchAsync(batchId, fileContent);
 
                 // update file to processing
-                await fileDatabaseService.UpdateFileStatusAsync(fileContent.Name, FileStatus.PROCESSING);
+                await fileDatabaseService.UpdateFileStatusAsync(fileContent.Operation, fileContent.Name, FileStatus.PROCESSING);
 
                 // send file to queue
                 await queueService.SendAsync(new FileMessageQueueDto
