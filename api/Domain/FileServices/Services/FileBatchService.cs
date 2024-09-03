@@ -10,6 +10,7 @@ namespace api.Domain.FileServices.Services;
 
 public class FileBatchService(
     ILogger<IFileBatchService> logger,
+    IBatchRepository batchRepository,
     IFileBatchRepository fileBatchRepository
 ) : IFileBatchService
 {
@@ -40,7 +41,12 @@ public class FileBatchService(
     {
         try
         {
-            return await fileBatchRepository.CreateBatchAsync(qtdyFiles);
+            return await batchRepository.CreateBatchAsync(new BatchEntity
+            {
+                CreateDate = DateTimeHelper.DataHoraDeBrasilia,
+                Status = Enum.GetName(typeof(FileStatus), FileStatus.PROCESSING),
+                QtdyFiles = qtdyFiles
+            });
         }
         catch (Exception ex)
         {
