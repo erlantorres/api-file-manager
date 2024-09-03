@@ -73,4 +73,10 @@ public class FileRepository(IDbContext context) : IFileRepository
     {
         await context.ExecuteAsync(_sqlInsert, fileEntity);
     }
+
+    public async Task UpdateFileStatusAsync(string operation, string fileName, string status)
+    {
+        string update = $@"update FileUpload set status = @{nameof(status)} where Name = @{nameof(fileName)} and Operation = @{nameof(operation)}";
+        await context.ExecuteAsync(update, new { operation, fileName, status });
+    }
 }

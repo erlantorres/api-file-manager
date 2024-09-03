@@ -38,7 +38,7 @@ public class FileDatabaseService(
     {
         try
         {
-             var file = await fileRepository.GetWithContentAsync(operation, fileName);
+            var file = await fileRepository.GetWithContentAsync(operation, fileName);
             return file.ParseWithContentToDto();
         }
         catch (Exception ex)
@@ -101,6 +101,20 @@ public class FileDatabaseService(
             var errorId = GetErrorId;
             logger.LogError(ex, $"UploadLargeFilesAsync error id {errorId}: {ex.Message}");
             throw new Exception($"Error uploading large file! Please provide the ID {errorId} to support for assistance.");
+        }
+    }
+
+    public async Task UpdateFileStatusAsync(string operation, string fileName, FileStatus status)
+    {
+        try
+        {
+            await fileRepository.UpdateFileStatusAsync(operation, fileName, Enum.GetName(typeof(FileStatus), status));
+        }
+        catch (Exception ex)
+        {
+            var errorId = GetErrorId;
+            logger.LogError(ex, $"UpdateFileStatusAsync error id {errorId}: {ex.Message}");
+            throw new Exception($"Error updating the file! Please provide the ID {errorId} to support for assistance.");
         }
     }
 }
