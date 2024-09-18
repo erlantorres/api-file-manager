@@ -1,3 +1,0 @@
-@api_HostAddress = https://localhost:7036/api/File
-
-DELETE {{api_HostAddress}}?operation=operation&fileName=file.zip

@@ -1,0 +1,26 @@
+@api_HostAddress = https://localhost:7036/api/File
+
+###
+DELETE {{api_HostAddress}}?operation=operation&fileName=file.zip
+
+###
+# GET
+GET {{api_HostAddress}}?operation=operation&fileName=file.xlsx
+
+###
+# GETALL
+GET {{api_HostAddress}}/get-all?operation=operation
+
+###
+#POST
+POST {{api_HostAddress}}/upload-large-files
+Content-Type: multipart/form-data; boundary=011000010111000001101001
+
+--011000010111000001101001
+Content-Disposition: form-data; operation=my_operation; name="name2"; filename="name2.xlsx"
+<@ C:\var\temp\imagem.png
+
+--011000010111000001101001--
+
+
+###

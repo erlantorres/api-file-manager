@@ -1,0 +1,15 @@
+@api_HostAddress = https://localhost:7036/api/ProcessingFile
+
+###
+#post batch-process/files
+POST {{api_HostAddress}}/batch-process/files
+Content-Type: application/json
+
+[
+    {
+        "Operation": "FILE_OPE",
+        "Name": "ConsultaRentabilidadeB3XXXXXX82015.xlsx"
+    }
+]
+
+###
