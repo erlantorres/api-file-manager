@@ -1,9 +1,0 @@
-@api_HostAddress = https://localhost:7036/api/File
-
-# GET
-GET {{api_HostAddress}}?operation=operation&fileName=file.xlsx
-
-###
-# GETALL
-GET {{api_HostAddress}}/get-all?operation=operation
-
