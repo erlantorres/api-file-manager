@@ -8,15 +8,10 @@ namespace FileManager.Api.Factories;
 
 public class QueueServiceFactory(IServiceProvider serviceProvider) : IQueueServiceFactory
 {
-    public IQueueService CreateQueueService(QueueType type)
+    public IQueueService CreateQueueService(QueueType type) => type switch
     {
-        using var scoped = serviceProvider.CreateScope();
-        var scopedProvider = scoped.ServiceProvider;
-        return type switch
-        {
-            QueueType.RabbitMQ => serviceProvider.GetRequiredService<RabbitMQService>(),
-            QueueType.AzureServiceBus => serviceProvider.GetRequiredService<AzureBusService>(),
-            _ => throw new ArgumentException("Unknown queue service type")
-        };
-    }
+        QueueType.RabbitMQ => serviceProvider.GetRequiredService<RabbitMQService>(),
+        QueueType.AzureServiceBus => serviceProvider.GetRequiredService<AzureBusService>(),
+        _ => throw new ArgumentException("Unknown queue service type")
+    };
 }

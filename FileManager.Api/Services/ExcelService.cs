@@ -1,5 +1,3 @@
-
-
 using FileManager.Api.Dtos;
 using FileManager.Api.Services.Interfaces;
 using NPOI.SS.UserModel;
@@ -11,11 +9,18 @@ public class ExcelService(IProcessingFileService processingFileService) : IExcel
 {
     public async Task ProcessFileAsync(int fileBatchId, FileContentDto fileContent)
     {
-        using var memoryStream = new MemoryStream(fileContent.Content);
-        memoryStream.Position = 0;
-        var workbook = new XSSFWorkbook(memoryStream);
-        await ReadWorkBookAsync(fileContent.Operation, fileBatchId, workbook);
-        workbook.Close();
+        try
+        {
+            using var memoryStream = new MemoryStream(fileContent.Content);
+            memoryStream.Position = 0;
+            var workbook = new XSSFWorkbook(memoryStream);
+            await ReadWorkBookAsync(fileContent.Operation, fileBatchId, workbook);
+            workbook.Close();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private async Task ReadWorkBookAsync(string operation, int fileBatchId, XSSFWorkbook workbook)
@@ -42,8 +47,8 @@ public class ExcelService(IProcessingFileService processingFileService) : IExcel
             {
                 await processingFileService.AddRowAsync(fileBatchId, row);
             }
-
-            await processingFileService.BulkInsertAsync();
         }
+
+        await processingFileService.BulkInsertAsync();
     }
 }

@@ -8,6 +8,6 @@ public class RabbitMQService(IBus bus) : IQueueService
 {
     public async Task SendAsync(FileMessageQueueDto fileMessageQueue)
     {
-        await bus.Send(fileMessageQueue);
+        await bus.Publish(fileMessageQueue);
     }
 }

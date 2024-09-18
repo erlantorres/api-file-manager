@@ -19,17 +19,24 @@ public class ProcessingFileService(
 
     public async Task AddRowAsync(int fileBatchId, IRow row)
     {
-        if (_dataTable == null || _dataTable == new DataTable())
+        try
         {
-            throw new ArgumentNullException(nameof(_dataTable));
+            if (_dataTable == null || _dataTable == new DataTable())
+            {
+                throw new ArgumentNullException(nameof(_dataTable));
+            }
+
+            object[] fields = GetFields(fileBatchId, row);
+            _dataTable.Rows.Add(fields);
+
+            if (_dataTable.Rows.Count > maxRows)
+            {
+                await BulkInsertAsync();
+            }
         }
-
-        object[] fields = GetFields(fileBatchId, row);
-        _dataTable.Rows.Add(fields);
-
-        if (_dataTable.Rows.Count > maxRows)
+        catch
         {
-            await BulkInsertAsync();
+            throw;
         }
     }
 
@@ -60,20 +67,27 @@ public class ProcessingFileService(
 
     public async Task ConfigureMappingAsync(string operation, List<ICell> cells)
     {
-        _operation = operation;
-
-        var tableProperties = await GetTableProperties(cells);
-        _dataTable = new DataTable(tableProperties.Name);
-        _dataTable.Columns.Add("FileBatchId", Type.GetType("System.Int32"));
-
-        string column;
-        foreach (var cell in cells)
+        try
         {
-            column = $"{cell}";
-            var tp = tableProperties.Properties.Where(x => x.ColumnName == column).First();
+            _operation = operation;
 
-            _dataTable.Columns.Add(column, Type.GetType(tp.Type));
-            _dataTable.Columns[column].AllowDBNull = tp.IsNullable;
+            var tableProperties = await GetTableProperties(cells);
+            _dataTable = new DataTable(tableProperties.Name);
+            _dataTable.Columns.Add("FileBatchId", Type.GetType("System.Int32"));
+
+            string column;
+            foreach (var cell in cells)
+            {
+                column = $"{cell}";
+                var tp = tableProperties.Properties.Where(x => x.ColumnName == column).First();
+
+                _dataTable.Columns.Add(column, Type.GetType(tp.Type));
+                _dataTable.Columns[column].AllowDBNull = tp.IsNullable;
+            }
+        }
+        catch
+        {
+            throw;
         }
     }
 
@@ -87,7 +101,7 @@ public class ProcessingFileService(
         }
 
         var properties = await tableRepository.GetTablePropertiesAsync(tableMapping.TableName);
-        if (properties == null || properties.Count() >= 0)
+        if (properties == null || properties.Count() <= 0)
         {
             throw new ArgumentNullException(nameof(properties));
         }
@@ -101,7 +115,14 @@ public class ProcessingFileService(
 
     public async Task BulkInsertAsync()
     {
-        await tableRepository.BulkInsertAsync(_dataTable);
-        _dataTable.Rows.Clear();
+        try
+        {
+            await tableRepository.BulkInsertAsync(_dataTable);
+            _dataTable.Rows.Clear();
+        }
+        catch
+        {
+            throw;
+        }
     }
 }

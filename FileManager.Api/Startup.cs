@@ -43,7 +43,7 @@ public static class Startup
 
     private static IServiceCollection AddFactories(this IServiceCollection services)
     {
-        services.AddTransient<IQueueServiceFactory, QueueServiceFactory>();
+        services.AddSingleton<IQueueServiceFactory, QueueServiceFactory>();
         return services;
     }
 
