@@ -13,7 +13,7 @@ public class BatchFileService(
     IBatchRepository batchRepository,
     IBatchFileRepository batchFileRepository,
     IBatchFileDocumentRepository batchFileDocumentRepository
-) : IBatchFileService
+) : IBatchService, IBatchFileService, IBatchFileDocumentService
 {
 
     private static string GetErrorId { get { return Guid.NewGuid().ToString(); } }
@@ -27,7 +27,7 @@ public class BatchFileService(
                 BatchId = batchId,
                 FileName = fileContent.Name,
                 Start = DateTimeHelper.DataHoraDeBrasilia,
-                Status = Enum.GetName(typeof(FileStatus), FileStatus.PROCESSING),
+                Status = FileStatus.PROCESSING.GetName(),
             });
         }
         catch (Exception ex)
@@ -45,7 +45,7 @@ public class BatchFileService(
             return await batchRepository.CreateBatchAsync(new BatchEntity
             {
                 CreateDate = DateTimeHelper.DataHoraDeBrasilia,
-                Status = Enum.GetName(typeof(FileStatus), FileStatus.PROCESSING),
+                Status = FileStatus.PROCESSING.GetName(),
                 QtdyFiles = qtdyFiles
             });
         }
@@ -57,14 +57,70 @@ public class BatchFileService(
         }
     }
 
-    public Task FinishProcessAsync(int batchId)
+    private async Task IncrementQtdyProcessedAsync(int batchId, FileStatus status)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var batch = await batchRepository.GetBatchByIdAsync(batchId);
+            if (batch == null || batch.Id <= 0)
+            {
+                throw new ArgumentNullException(nameof(batch), $"Batch not found for id: {batchId}");
+            }
+
+            if (status == FileStatus.PROCESSED)
+            {
+                batch.QtdyFilesProcessed += 1;
+            }
+            else
+            {
+                batch.QtdyFilesFailed += 1;
+            }
+
+            var total = batch.QtdyFilesProcessed + batch.QtdyFilesFailed;
+            if (batch.QtdyFiles >= total)
+            {
+                batch.FinishDate = DateTimeHelper.DataHoraDeBrasilia;
+                batch.Status = FileStatus.UNDEFINED.GetName();
+            }
+            else if (batch.QtdyFiles == total)
+            {
+                batch.FinishDate = DateTimeHelper.DataHoraDeBrasilia;
+                batch.Status = FileStatus.PROCESSED.GetName();
+            }
+
+            await batchRepository.UpdateAsync(batch);
+        }
+        catch (Exception ex)
+        {
+            var errorId = GetErrorId;
+            logger.LogError(ex, $"IncrementQtdyProcessedAsync batch process id {batchId}, error id {errorId}: {ex.Message}");
+            throw new Exception($"Error increment qtdy file processed to batch process id {batchId}! Please provide the ID {errorId} to support for assistance.");
+        }
     }
 
-    public Task IncrementQtdyProcessedAsync(int batchId, bool processedSuccessfull)
+    public async Task FinishFileProcessAsync(int batchFileId, FileStatus status, string message = "")
     {
-        throw new NotImplementedException();
+        try
+        {
+            var batchFile = await batchFileRepository.GetByIdAsync(batchFileId);
+            if (batchFile == null)
+            {
+                throw new ArgumentNullException(nameof(batchFile), $"Batch file not found for id: {batchFileId}");
+            }
+
+            batchFile.Status = status.GetName();
+            batchFile.Finish = DateTimeHelper.DataHoraDeBrasilia;
+            batchFile.Message = message;
+            await batchFileRepository.UpdateAsync(batchFile);
+
+            await IncrementQtdyProcessedAsync(batchFile.BatchId, status);
+        }
+        catch (Exception ex)
+        {
+            var errorId = GetErrorId;
+            logger.LogError(ex, $"UpdateFileProcessAsync batch file process id {batchFileId}, error id {errorId}: {ex.Message}");
+            throw new Exception($"Error updating the file batch process id {batchFileId}! Please provide the ID {errorId} to support for assistance.");
+        }
     }
 
     public async Task<List<BatchFileDocumentDto>> GetDocumentsFilesToDeleteAsync(int batchId)
@@ -109,6 +165,26 @@ public class BatchFileService(
             var errorId = GetErrorId;
             logger.LogError(ex, $"GetDocumentsFilesToDeleteAsync error id {errorId}: {ex.Message}");
             throw new Exception($"Error to Get documents to delete! Please provide the ID {errorId} to support for assistance.");
+        }
+    }
+
+    public async Task AddDocumentsToFileAsync(int batchFileId, List<string> documents)
+    {
+        try
+        {
+            var entities = new List<FileDocumentEntity>();
+            documents.Distinct().ToList().ForEach(document =>
+            {
+                entities.Add(new() { FileId = batchFileId, DocumentNumber = document });
+            });
+
+            await batchFileDocumentRepository.SaveAsync(entities);
+        }
+        catch (Exception ex)
+        {
+            var errorId = GetErrorId;
+            logger.LogError(ex, $"AddDocumentsToFileAsync batch file document process id {batchFileId}, error id {errorId}: {ex.Message}");
+            throw new Exception($"Error adding the document to file batch process id {batchFileId}! Please provide the ID {errorId} to support for assistance.");
         }
     }
 }

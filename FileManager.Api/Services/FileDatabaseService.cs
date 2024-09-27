@@ -83,7 +83,7 @@ public class FileDatabaseService(
                     {
                         CreateDate = DateTimeHelper.DataHoraDeBrasilia,
                         Operation = contentDisposition.Name.Value,
-                        Status = Enum.GetName(typeof(FileStatus), FileStatus.UPLOAD),
+                        Status = FileStatus.UPLOAD.GetName(),
                         Name = WebUtility.HtmlEncode(contentDisposition.FileName.Value),
                         UnTrustedName = contentDisposition.FileName.Value,
                         Size = fileBytes.Length,
@@ -106,7 +106,7 @@ public class FileDatabaseService(
     {
         try
         {
-            await fileRepository.UpdateFileStatusAsync(operation, fileName, Enum.GetName(typeof(FileStatus), status));
+            await fileRepository.UpdateFileStatusAsync(operation, fileName, status.GetName());
         }
         catch (Exception ex)
         {

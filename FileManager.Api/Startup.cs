@@ -29,7 +29,10 @@ public static class Startup
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddTransient<IBatchService, BatchFileService>();
         services.AddTransient<IBatchFileService, BatchFileService>();
+        services.AddTransient<IBatchFileDocumentService, BatchFileService>();
+
         services.AddTransient<IExcelService, ExcelService>();
         services.AddTransient<IFileDatabaseService, FileDatabaseService>();
         services.AddTransient<IProcessingFileManagerService, ProcessingFileManagerService>();

@@ -9,4 +9,5 @@ public class BatchEntity
     public string Status { get; set; }
     public int QtdyFiles { get; set; }
     public int QtdyFilesProcessed { get; set; }
+    public int QtdyFilesFailed { get; set; }
 }
