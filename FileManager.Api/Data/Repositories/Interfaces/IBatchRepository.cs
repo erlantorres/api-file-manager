@@ -7,5 +7,6 @@ public interface IBatchRepository
 {
     Task<int> CreateBatchAsync(BatchEntity batchEntity);
     Task<IEnumerable<BatchEntity>> GetAllAsync();
-    Task<BatchEntity> GetBatchByIdAsync(int batchId);
+    Task<BatchEntity?> GetBatchByIdAsync(int batchId);
+    Task UpdateAsync(BatchEntity batch);
 }

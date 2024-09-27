@@ -14,14 +14,27 @@ public class BatchFileDocumentRepository(IDbContext context) : IBatchFileDocumen
         BatchFileDocument with(nolock)
     ";
 
-    public Task<IEnumerable<FileDocumentEntity>> GetAllAsync()
+    private const string _sqlInsert = $@"
+    insert into BatchFileDocument (FileId, DocumentNumber)
+    values (
+        @{nameof(FileDocumentEntity.FileId)},
+        @{nameof(FileDocumentEntity.DocumentNumber)}
+    )
+    ";
+
+    public async Task<IEnumerable<FileDocumentEntity>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await context.QueryAsync<FileDocumentEntity>(_sqlSelect);
     }
 
     public async Task<IEnumerable<FileDocumentEntity>> GetDocumentEntityAsync(string fileId)
     {
         var sql = $@"{_sqlSelect} where fileId = @{nameof(fileId)}";
         return await context.QueryAsync<FileDocumentEntity>(sql, new { fileId });
+    }
+
+    public async Task SaveAsync(List<FileDocumentEntity> entities)
+    {
+        await context.ExecuteAsync(_sqlInsert, entities);
     }
 }

@@ -5,7 +5,7 @@ namespace FileManager.Api.Services.Interfaces;
 
 public interface IProcessingFileService
 {
-    Task AddRowAsync(int fileBatchId, IRow row);
+    Task<string> AddRowAsync(int batchId, int fileBatchId, IRow row);
     Task BulkInsertAsync();
     Task ConfigureMappingAsync(string operation, List<ICell> cells);
 }

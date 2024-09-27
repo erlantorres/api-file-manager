@@ -9,6 +9,7 @@ using NPOI.SS.UserModel;
 namespace FileManager.Api.Services;
 
 public class ProcessingFileService(
+    ILogger<ProcessingFileService> logger,
     IFileMappingRepository fileMappingRepository,
     ITableRepository tableRepository
 ) : IProcessingFileService
@@ -16,8 +17,9 @@ public class ProcessingFileService(
     private const int maxRows = 10000;
     private DataTable _dataTable { get; set; }
     private string _operation { get; set; }
+    private const int _startIndex = 2;
 
-    public async Task AddRowAsync(int fileBatchId, IRow row)
+    public async Task<string> AddRowAsync(int batchId, int fileBatchId, IRow row)
     {
         try
         {
@@ -26,13 +28,15 @@ public class ProcessingFileService(
                 throw new ArgumentNullException(nameof(_dataTable));
             }
 
-            object[] fields = GetFields(fileBatchId, row);
+            object[] fields = GetFields(batchId, fileBatchId, row);
             _dataTable.Rows.Add(fields);
 
             if (_dataTable.Rows.Count > maxRows)
             {
                 await BulkInsertAsync();
             }
+
+            return fields[_startIndex]?.ToString();
         }
         catch
         {
@@ -40,13 +44,14 @@ public class ProcessingFileService(
         }
     }
 
-    private object[] GetFields(int fileBatchId, IRow row)
+    private object[] GetFields(int batchId, int fileBatchId, IRow row)
     {
         var totalColumn = _dataTable.Columns.Count;
         object[] fields = new object[totalColumn];
-        fields[0] = fileBatchId;
+        fields[0] = batchId;
+        fields[1] = fileBatchId;
 
-        for (int i = 1; i < totalColumn; i++)
+        for (int i = _startIndex; i < totalColumn; i++)
         {
             var column = _dataTable.Columns[i];
 
