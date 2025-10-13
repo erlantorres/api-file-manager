@@ -54,7 +54,7 @@ public static class Startup
     {
         services.AddTransient<IFileRepository, FileRepository>();
         services.AddTransient<IFileMappingRepository, FileMappingRepository>();
-        services.AddTransient<ITableRepository, TableRepository>();
+        services.AddTransient<ISystemTableRepository, SystemTableRepository>();
         services.AddTransient<IBatchRepository, BatchRepository>();
         services.AddTransient<IBatchFileRepository, BatchFileRepository>();
         services.AddTransient<IBatchFileDocumentRepository, BatchFileDocumentRepository>();
